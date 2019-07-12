@@ -1,0 +1,51 @@
+---
+name: Getting started
+route: /getting-started
+---
+
+import { Playground, Props } from 'docz'
+
+# Getting started
+
+## Install
+
+```
+npm i react-elasticsearch
+```
+
+## Usage
+
+### Display records
+
+The example below just display records from an elasticsearch database.
+
+```jsx
+import { Elasticsearch, Results } from "react-elasticsearch";
+
+export default function MyComponent() {
+  return (
+    <Elasticsearch url={url}>
+      <Results
+        id="result"
+        items={data => data.map(item => <>{item._source.title}</>)}
+      />
+    </Elasticsearch>
+  );
+}
+```
+
+It displays something like this:
+
+import { Elasticsearch, Results } from "react-elasticsearch";
+import { conf } from "./helpers.js"
+import "./styles.css";
+
+<Playground>
+<Elasticsearch url={conf.url} headers={conf.headers}>
+  <Results
+    id="result"
+    itemsPerPage="8"
+    items={data => data.map(item => <div>{item._source.original_title}</div>)}
+  />
+</Elasticsearch>
+</Playground>

@@ -3,7 +3,12 @@ name: Recipes
 route: /recipes
 ---
 
+# Recipes
+
 ## Sortable Results
+
+This example creates two selectors: "sort by" and "sort order" (ex: `sort by "creationDate asc"`).
+Use the `sort` prop in `<Results />` component, add some hooks to handle change.
 
 ```jsx
 function SortableResults() {
@@ -49,6 +54,8 @@ function SortableResults() {
 
 ## Custom Pagination
 
+Use the `pagination` prop with a callback in `<Results />` component.
+
 ```jsx
 <Elasticsearch url={url}>
   <Results
@@ -67,6 +74,74 @@ function SortableResults() {
     )}
   />
 </Elasticsearch>
+```
+
+## Collapasble Facet
+
+First, create a `<CollapsableFacet />` component.
+
+```jsx
+function CollapsableFacet({ initialCollapsed, title, ...rest }) {
+  const [collapsed, setCollapsed] = useState(true);
+
+  function FacetWrapper() {
+    if (!collapsed) {
+      return <Facet {...rest} />;
+    }
+    return <div />;
+  }
+  return (
+    <div>
+      <div>
+        {title}
+        <button
+          onClick={() => {
+            setCollapsed(!collapsed);
+          }}
+        >
+          open
+        </button>
+      </div>
+      {FacetWrapper()}
+    </div>
+  );
+}
+```
+
+Then, use this `<CollapsableFacet />` in your app:
+
+```jsx
+function MyComponent() {
+  return (
+    <Elasticsearch url={url}>
+      <CollapsableFacet id="autr" fields={["author.keyword"]} />
+      <Results
+        id="result"
+        items={ /* your items map function */ }
+        pagination={() => <></>}
+      />
+    </Elasticsearch>
+  );
+}
+```
+
+## Case insensitive filter in facet
+
+Create a function then pass it to `filterValueModifier` of `<Facet />`.
+
+```JSX
+function caseInsensitiveSearch(text) {
+  return text.replace(/([a-z])/gi, (w, x) => `[${x.toUpperCase()}${x.toLowerCase()}]`);
+}
+
+function CaseInsensitiveSearchFacet() {
+  <Facet
+      id="original_language"
+      fields={["original_language.keyword"]}
+      initialValue={["French", "English"]}
+      filterValueModifier={caseInsensitiveSearch}
+    />
+}
 ```
 
 ## Example CSS
@@ -218,53 +293,4 @@ ul.react-es-pagination > li {
   margin-right: 20px;
 }
 
-```
-
-## Collapasble Facet
-
-```jsx
-function CollapsableFacet({ initialCollapsed, title, ...rest }) {
-  const [collapsed, setCollapsed] = useState(true);
-
-  function FacetWrapper() {
-    if (!collapsed) {
-      return <Facet {...rest} />;
-    }
-    return <div />;
-  }
-  return (
-    <div>
-      <div>
-        {title}
-        <button
-          onClick={() => {
-            setCollapsed(!collapsed);
-          }}
-        >
-          open
-        </button>
-      </div>
-      {FacetWrapper()}
-    </div>
-  );
-}
-
-function MyComponent() {
-  return (
-    <Elasticsearch url={url}>
-      <CollapsableFacet id="autr" fields={["author.keyword"]} />
-      <Results
-        id="result"
-        items={data =>
-          data.map(({ _source: s, _id }) => (
-            <div key={_id}>
-              {s.TICO} - {s.AUTR}
-            </div>
-          ))
-        }
-        pagination={() => <></>}
-      />
-    </Elasticsearch>
-  );
-}
 ```

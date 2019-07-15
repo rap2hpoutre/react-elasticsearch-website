@@ -14,28 +14,28 @@
   margin-top: 5px;
   margin-bottom: 30px;
 }
-.movies {
+.demo .movies {
   display: grid;
   grid-template-columns: 250px 1fr;
   grid-gap: 15px;
 }
-img {
+.demo img {
   display: block;
   margin: auto;
   margin-bottom: 5px;
   width: 100%;
 }
-.react-es-results-items {
+.demo .react-es-results-items {
   margin-top: 15px;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
   grid-gap: 30px;
 }
-.card {
+.demo .card {
   margin-bottom: 25px;
   text-align: center;
 }
-.collapsable-facet {
+.demo .collapsable-facet {
   background-color: #f8f8f8;
   border-radius: 5px;
   box-shadow: 1px 2px 2px 0 rgba(197, 197, 197, 0.5);
@@ -46,12 +46,12 @@ img {
   color: #333;
 }
 
-.collapsable-facet-title {
+.demo .collapsable-facet-title {
   font-weight: 700;
   font-size: 16px;
 }
-.collapsable-facet-title > button,
-ul.react-es-pagination > li > button {
+.demo .collapsable-facet-title > button,
+.demo ul.react-es-pagination > li > button {
   border: none;
   background: transparent;
   outline: none;
@@ -59,30 +59,30 @@ ul.react-es-pagination > li > button {
   font-weight: bold;
 }
 
-.collapsable-facet-title > button:focus {
+.demo .collapsable-facet-title > button:focus {
   outline: none;
 }
 
-ul.react-es-pagination > li.react-es-pagination-active-page {
+.demo ul.react-es-pagination > li.react-es-pagination-active-page {
   background: #0062cc;
 }
-ul.react-es-pagination > li.react-es-pagination-active-page > button {
+.demo ul.react-es-pagination > li.react-es-pagination-active-page > button {
   color: white;
 }
 
-.collapsable-facet-title > button {
+.demo .collapsable-facet-title > button {
   float: right;
   color: #8999ae;
   transform: scale(1.5, 1);
 }
 
-.react-es-facet {
+.demo .react-es-facet {
   border-top: 1px solid rgb(203, 203, 203);
   margin-top: 10px;
   padding-top: 15px;
 }
 
-.react-es-facet > input[type="text"] {
+.demo .react-es-facet > input[type="text"] {
   margin-top: 10px;
   padding: 5px;
   height: 30px;
@@ -93,22 +93,22 @@ ul.react-es-pagination > li.react-es-pagination-active-page > button {
   box-sizing: border-box;
 }
 
-.react-es-facet > label {
+.demo .react-es-facet > label {
   display: block;
   margin-bottom: 5px;
 }
 
-.react-es-facet > label > input[type="checkbox"] {
+.demo .react-es-facet > label > input[type="checkbox"] {
   margin-right: 5px;
 }
-.react-es-facet > button {
+.demo .react-es-facet > button {
   border: none;
   background: transparent;
   text-align: center;
   width: 100%;
 }
 
-ul.react-es-pagination > li {
+.demo ul.react-es-pagination > li {
   background-color: #fafafa;
   margin: 5px 7px 5px 0;
   padding: 5px 7px;
@@ -116,17 +116,17 @@ ul.react-es-pagination > li {
   border-radius: 2px;
   box-shadow: 1px 2px 2px 0 rgba(197, 197, 197, 0.5);
 }
-ul.react-es-pagination {
+.demo ul.react-es-pagination {
   list-style: none;
   padding: 0;
 }
-ul.react-es-pagination {
+.demo ul.react-es-pagination {
   margin-top: 15px;
 }
-ul.react-es-pagination > li {
+.demo ul.react-es-pagination > li {
   display: inline;
 }
-.react-es-searchbox input {
+.demo .react-es-searchbox input {
   box-sizing: border-box;
   padding: 5px;
   height: 30px;
@@ -136,7 +136,7 @@ ul.react-es-pagination > li {
   border-radius: 5px;
   box-sizing: border-box;
 }
-.react-es-searchbox {
+.demo .react-es-searchbox {
   width: 100%;
   margin-right: 20px;
 }

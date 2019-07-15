@@ -3,10 +3,155 @@ name: Advanced Usage
 route: /advanced-usage
 ---
 
-# Advanced Usage
+import { Playground, Props, Link } from "docz";
+import {
+  Elasticsearch,
+  SearchBox,
+  Facet,
+  Results,
+  ActiveFilters,
+  QueryBuilder
+} from "react-elasticsearch";
+import { conf } from "./helpers.js";
 
-## CustomWidget Component
+# Advanced Usage
 
 ## URL params
 
+There is no built-in router nor hack to read and write URL params.
+The main pro is you will have no conflict with your favourite router
+(even if you use none and manipulate the `window.location`) like `react-router`, `next-router`, etc.
+The downsite is everything must be done manually.
+Still there are two helpers function that works for all tested routers:
+`fromUrlQueryString` and `toUrlQueryString`.
+
+The example below creates initial values from virtual URL string, then virtually update
+ths URL foreach change (look at the `initialValues` occurrences).
+
+```jsx
+import {
+  Elasticsearch,
+  SearchBox,
+  Facet,
+  Results,
+  fromUrlQueryString,
+  toUrlQueryString
+} from "react-elasticsearch";
+
+function WithUrlParams() {
+  const [queryString, setQueryString] = useState("");
+
+  // Initialize `fromUrlQueryString` with data from your router, or window location.
+  const initialValues = fromUrlQueryString("main=%22h%22&resultPage=2");
+  return (
+    <Elasticsearch
+      url={url}
+      onChange={values => {
+        setQueryString(toUrlQueryString(values));
+      }}
+    >
+      <div>Params: {queryString}</div>
+      <SearchBox
+        id="main"
+        fields={["title"]}
+        initialValue={initialValues.get("main")}
+      />
+      <Facet
+        id="author"
+        fields={["author.keyword"]}
+        initialValue={initialValues.get("author")}
+      />
+      <Results
+        id="result"
+        initialPage={initialValues.get("resultPage")}
+        items={data =>
+          data.map(({ _source, _id }) => <div key={_id}>{_source.TICO}</div>)
+        }
+      />
+    </Elasticsearch>
+  );
+}
+```
+
 ## Query Builder
+
+An advanced component to create queries.
+
+```jsx
+<QueryBuilder
+  id="qb"
+  fields={[
+    { value: "original_title.keyword", text: "Title" },
+    { value: "original_language.keyword", text: "Language" }
+  ]}
+/>
+```
+
+<Playground>
+  <Elasticsearch url={conf.url} headers={conf.headers}>
+    <QueryBuilder
+      id="qb"
+      fields={[
+        { value: "original_title.keyword", text: "Title" },
+        { value: "original_language.keyword", text: "Language" }
+      ]}
+      initialValue={[
+        {
+          field: "original_title.keyword",
+          operator: "==",
+          value: "Minions",
+          combinator: "OR",
+          index: 0
+        },
+        {
+          field: "original_title.keyword",
+          operator: "*",
+          value: "John",
+          combinator: "OR",
+          index: 1
+        }
+      ]}
+    />
+    <Results
+      id="result"
+      items={data =>
+        data.map(({ _source, _id }) => (
+          <div key={_id}>{_source.original_title}</div>
+        ))
+      }
+    />
+  </Elasticsearch>
+</Playground>
+
+## CustomWidget Component
+
+`<CustomWidget />` is a wrapper that gives full access to the internal API
+(queries, configuration, etc.) via a `ctx` property.
+You have to create your own component before using it.
+
+```jsx
+function MyComponent({ ctx }) {
+  return (
+    <div>
+      <h2>List widgets objects</h2>
+      <ul>
+        {ctx.widgets.values().map(e => (
+          <li>{JSON.stringify(e)}</li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+```
+
+```jsx
+<Elasticsearch url={conf.url} headers={conf.headers}>
+  <CustomWidget>
+    <MyComponent />
+  </CustomWidget>
+  <Results
+    id="result"
+    items={/* items function here. */}
+  />
+</Elasticsearch>
+```

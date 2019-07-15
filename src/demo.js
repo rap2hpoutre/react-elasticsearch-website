@@ -122,6 +122,7 @@ export default function demo() {
             </div>
             <Results
               id="result"
+              itemsPerPage="12"
               items={data =>
                 data.map(({ _source, _score, _id }) => (
                   <div key={_id} className="card">

@@ -4,7 +4,13 @@ route: /components
 ---
 
 import { Playground, Props, Link } from "docz";
-import { Elasticsearch, SearchBox, Facet, Results } from "react-elasticsearch";
+import {
+  Elasticsearch,
+  SearchBox,
+  Facet,
+  Results,
+  ActiveFilters
+} from "react-elasticsearch";
 import { conf } from "./helpers.js";
 
 # Components
@@ -247,7 +253,7 @@ This example displays a "release year" facet and the result hits from an Elastic
 The `ID` of the component. <br />
 Each component inside `<ElasticSearch />` requires an `ID`, see [Advanced Usage](/advanced-usage) for more.
 
-### **fields** `Array of String [required]`
+#### **fields** `Array of String [required]`
 
 Data field to be connected to the component’s UI view.
 The list items are filtered by a database query on this field.
@@ -259,4 +265,151 @@ You may use a field of type `raw`, `keyword` or `not_analyzed` depending on your
 <Facet id="original_language" fields={["original_language.keyword"]} />
 ```
 
+#### **itemsPerBlock** `Unsigned Integer [optional]` (default `5`)
+
+Number of items displayed per block. This number determines the `data` in `items` function prop.
+
+#### **initialValue** `Unsigned Integer [optional]`
+
+The initial values selected in facet. In other words the "pre-checked" list items.
+See [URL params](/advanced-usage#url-params) in [Advanced Usage](/advanced-usage)
+for a real world example usage.
+
+```jsx
+<Facet
+  id="original_language"
+  fields={["original_language.keyword"]}
+  initialValue={["French", "English"]}
+/>
+```
+
+<Playground>
+  <Elasticsearch url={conf.url} headers={conf.headers}>
+    <Facet
+      id="original_language"
+      fields={["original_language.keyword"]}
+      initialValue={["French", "English"]}
+    />
+  </Elasticsearch>
+</Playground>
+
+#### **seeMore** `String [optional]` (default: `See more`)
+
+The text displayed in order to see more filter in facet (`itemsPerBlock` more).
+
+#### **showFilter** `Boolean [optional]` (default: `true`)
+
+Determines if the filter `input` box on top of the facet is displayed.
+This filter is like a search box in the component itself.
+
+#### **placeholder** `String [optional]` (default: `filter…`)
+
+The placeholder text displayed if `showFilter` is `true` (i.e filter input box is shown).
+
+#### **filterValueModifier** `Function [optional]`
+
+Modify the text wrote in filter input box (if `showFilter` is `true`)
+before performing search.
+
+```jsx
+function caseInsensitiveSearch(text) {
+  return text.replace(
+    /([a-z])/gi,
+    (w, x) => `[${x.toUpperCase()}${x.toLowerCase()}]`
+  );
+}
+
+function CaseInsensitiveSearchFacet() {
+  <Facet
+    id="original_language"
+    fields={["original_language.keyword"]}
+    initialValue={["French", "English"]}
+    filterValueModifier={caseInsensitiveSearch}
+  />;
+}
+```
+
+#### **items** `Function [optional]`
+
+Similar to `items` in `<Results />` component.
+Default is a list with one checkbox per line.
+_To do: document callback function._
+
+```jsx
+<Facet
+  id="original_language"
+  fields={["original_language.keyword"]}
+  items={(data, { handleChange, isChecked }) => {
+    return data.map(item => (
+      <div
+        style={{ color: isChecked(item) ? "green" : "black" }}
+        onClick={() => handleChange(item, !isChecked(item))}
+      >
+        -> {item.key}
+      </div>
+    ));
+  }}
+/>
+```
+
 ## ActiveFilters
+
+This component shows all the filters that have been applied to the current search.
+
+### Usage
+
+```jsx
+<ActiveFilters id="active-filters" />
+```
+
+<Playground>
+  <Elasticsearch url={conf.url} headers={conf.headers}>
+    Active Filters:
+    <ActiveFilters id="af" />
+    <SearchBox id="title" fields={["original_title"]} initialValue={"Demain"} />
+    <Facet
+      id="original_language"
+      showFilter={false}
+      fields={["original_language.keyword"]}
+      initialValue={["French"]}
+    />
+    <Results
+      id="result"
+      items={data =>
+        data.map(({ _source: s, _id }) => (
+          <div key={_id}>{s.original_title}</div>
+        ))
+      }
+      pagination={() => <></>}
+    />
+  </Elasticsearch>
+</Playground>
+
+### Props
+
+#### **id** `Function [required]`
+
+The `ID` of the component. <br />
+Each component inside `<ElasticSearch />` requires an `ID`, see [Advanced Usage](/advanced-usage) for more.
+
+#### **items** `Function [optional]`
+
+Similar to `items` in `<Results />` component.
+Default is a list with a close button for each element.
+
+```jsx
+<Facet
+  id="original_language"
+  fields={["original_language.keyword"]}
+  items={(activeFilters, removeFilter) => {
+    return activeFilters.map(({ key, value }) => {
+      return (
+        <li key={key}>
+          <span>{`${key}: ${value}`}</span>
+          <button onClick={() => removeFilter(key)}>close button</button>
+        </li>
+      );
+    });
+  }}
+/>
+```

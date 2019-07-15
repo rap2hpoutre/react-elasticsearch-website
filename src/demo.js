@@ -30,7 +30,7 @@ function customQueryMovie(query) {
 
 export default function demo() {
   return (
-    <div class="demo">
+    <div className="demo">
       <h3>🍿 Demo application - Movie database</h3>
       <div className="movies">
         <Elasticsearch

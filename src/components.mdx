@@ -1,0 +1,262 @@
+---
+name: Components
+route: /components
+---
+
+import { Playground, Props, Link } from "docz";
+import { Elasticsearch, SearchBox, Facet, Results } from "react-elasticsearch";
+import { conf } from "./helpers.js";
+
+# Components
+
+## Elasticsearch
+
+The main component `< Elasticsearch />`.
+It should wrap all other component, works thanks to an internal `<Listener />`.
+
+### Usage
+
+```jsx
+import { Elasticsearch } from "react-elasticsearch";
+
+export default function MyComponent() {
+  return (
+    <Elasticsearch url={url} headers={{ Authorization: "Basic xxx" }}>
+      {/* My reactive components here. */}
+    </Elasticsearch>
+  );
+}
+```
+
+### Props
+
+#### **url** `String [required]`
+
+URL of your elasticsearch instance.
+Could be something like http://127.0.0.1:9200 or http://myaws.eu-west-3.es.amazonaws.com
+
+#### **headers** `Object [optional]`
+
+Additional headers, e.g: `{ Authorization: "Basic xxx"}`
+
+#### **onChange** `Function [optional]`
+
+Accept a function that is triggered for each change of something inside (`useEffect` hook).
+The callback receives a `param`.
+
+```html
+<Elasticsearch url={url} onChange={params => console.log(params)}>
+  {/* My reactive components here. */}
+</Elasticsearch>
+```
+
+## Results
+
+`<Results />` creates a data-driven result list UI component.
+This list reactively updates itself based on changes in other components.
+
+### Usage
+
+This example displays the result hits from an Elasticsearch instance, with their score and ID.
+
+```jsx
+<Elasticsearch url={url}>
+  <Results
+    id="result"
+    items={data =>
+      data.map(({ _source, _id, _score }) => (
+        <div key={_id}>
+          <b>{_source.title}</b> - score: {_score} - id: {_id}
+        </div>
+      ))
+    }
+  />
+</Elasticsearch>
+```
+
+<Playground>
+  <Elasticsearch url={conf.url} headers={conf.headers}>
+    <Results
+      id="result"
+      items={data =>
+        data.map(({ _source, _id, _score }) => (
+          <div key={_id}>
+            <b>{_source.original_title}</b> - score: {_score} - id: {_id}
+          </div>
+        ))
+      }
+    />
+  </Elasticsearch>
+</Playground>
+
+### Props
+
+#### **id** `Function [required]`
+
+The `ID` of the component. <br />
+Each component inside `<ElasticSearch />` requires an `ID`, see [Advanced Usage](/advanced-usage) for more.
+
+#### **items** `Function [required]`
+
+The function that display the result hits. It receives `data`, which is an array of object.
+Each object is the raw data received via Elasticsearch, so you could access `_source`
+(the actual hit), the `_id` (internal Elasticsearch id) and ths `_score`
+(which could be useful for debugging). Example function for `items` prop:
+
+```jsx
+function displayItems(data) {
+  return data.map(({ _source, _id, _score }) => (
+    <div key={_id}>
+
+      <h2>Title</h2>
+      <b>{_source.title}</b>
+
+      <h2>Raw source</h2>
+      <pre>{JSON.stringify(_source)}</pre>
+
+      <h2>score</h2>
+      <i>{_score}</i>
+
+      <h2>ID</h2>
+      {_id}
+    </div>
+  );
+}
+```
+
+#### **itemsPerPage** `Unsigned Integer [optional]` (default `10`)
+
+Number of items displayed per page. This number determines the `data` in `items` function prop.
+
+#### **initialPage** `Unsigned Integer [optional]`
+
+The initial page. See [URL params](/advanced-usage#url-params) in [Advanced Usage](/advanced-usage)
+for a real world example usage.
+
+#### **pagination** `Function [optional]`
+
+See [Custom Pagination](/recipes#custom-pagination) in [Recipes](/recipes).
+
+#### **stats** `Function [optional]`
+
+Default stats displays something like "14 results". It can be customized via `stats` function
+
+```jsx
+<Results
+  id="result"
+  items={/* ... */}
+  stats={total => <div style={{ color: "green" }}>{total} results CUSTOM!</div>}
+/>
+```
+
+#### **sort** `Array [optional]`
+
+Use this if you want to sort results. Example: `[{ "creationDate": { order: "desc" } }]`
+See [Sortable Results](/recipes#sortable-results) in [Recipes](/recipes).
+
+### Style
+
+Use `react-es-results`, `react-es-results-items`, `react-es-pagination` and `react-es-pagination-active-page`
+to customize result style. See examples below.
+
+```CSS
+/* Result items */
+.react-es-results-items {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  grid-gap: 30px;
+}
+```
+
+```CSS
+/* Pagination */
+ul.react-es-pagination > li > button {
+  border: none;
+  background: transparent;
+  outline: none;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+ul.react-es-pagination > li.react-es-pagination-active-page {
+  background: #0062cc;
+}
+ul.react-es-pagination > li.react-es-pagination-active-page > button {
+  color: white;
+}
+
+ul.react-es-pagination > li {
+  background-color: #fafafa;
+  margin: 5px 7px 5px 0;
+  padding: 5px 7px;
+  border: 1px solid #ddd;
+  border-radius: 2px;
+  box-shadow: 1px 2px 2px 0 rgba(197, 197, 197, 0.5);
+}
+ul.react-es-pagination {
+  list-style: none;
+  padding: 0;
+}
+ul.react-es-pagination {
+  margin-top: 15px;
+}
+ul.react-es-pagination > li {
+  display: inline;
+}
+```
+
+## Facet
+
+`<Facet />` creates a multiple selection based filter list UI component
+that is connected to a database field. Lets the user refine the search results.
+
+### Usage
+
+This example displays a "release year" facet and the result hits from an Elasticsearch instance.
+
+```jsx
+<Elasticsearch url={conf.url} headers={conf.headers}>
+  <Facet id="release_year" fields={["release_year"]} />
+  <Results id="result" items={ /* */} />
+</Elasticsearch>
+```
+
+<Playground>
+  <Elasticsearch url={conf.url} headers={conf.headers}>
+    <strong>Facet "original_language"</strong>
+    <Facet
+      id="original_language"
+      fields={["original_language.keyword"]}
+      placeholder="type En..."
+    />
+    <hr />
+    <Results
+      id="result"
+      items={data => data.map(item => <div>{item._source.original_title}</div>)}
+      pagination={() => <></>}
+      stats={() => <></>}
+    />
+  </Elasticsearch>
+</Playground>
+
+### Props
+
+#### **id** `Function [required]`
+
+The `ID` of the component. <br />
+Each component inside `<ElasticSearch />` requires an `ID`, see [Advanced Usage](/advanced-usage) for more.
+
+### **fields** `Array of String [required]`
+
+Data field to be connected to the component’s UI view.
+The list items are filtered by a database query on this field.
+This field is used for doing an aggregation and returns the result.
+You may use a field of type `raw`, `keyword` or `not_analyzed` depending on your Elasticsearch cluster.
+
+```jsx
+// Don't forget to add `keyword` (or use raw format).
+<Facet id="original_language" fields={["original_language.keyword"]} />
+```
+
+## ActiveFilters

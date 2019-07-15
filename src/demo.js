@@ -31,7 +31,7 @@ function customQueryMovie(query) {
 export default function demo() {
   return (
     <div class="demo">
-      <h3>Demo application - Movie database</h3>
+      <h3>🍿 Demo application - Movie database</h3>
       <div className="movies">
         <Elasticsearch
           url={"https://scalr.api.appbase.io/react-elasticsearch-films"}

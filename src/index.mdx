@@ -1,0 +1,43 @@
+---
+name: Home
+route: /
+---
+
+import Demo from "./demo.js";
+
+# UI components for React + Elasticsearch
+
+> A search interface that simply works. The easiest way to build data-driven search experiences.
+
+## Live demo
+
+<Demo />
+
+## Quick intro
+
+Write expressive code to create search applications using declarative components.
+
+```jsx
+const MySearchComponent = () => (
+  <Elasticsearch url="http://example.org/search">
+    <SearchBox id="mainSearch" />
+    <Facet id="actors" fields={["actors"]} />
+    <Facet id="releasedYear" fields={["releasedYear"]} />
+    <Results
+      id="results"
+      items={data =>
+        // Map on result hits and display whatever you want.
+        data.map(item => <MyCardItem key={item._id} source={item._source} />)
+      }
+    />
+  </Elasticsearch>
+);
+```
+
+## Main features
+
+- 🏝 Released under **MIT licence**.
+- 👩‍🎨 Each component is built with React and is **customisable**. Not too much extra features nor magic.
+- 💅 It comes with **no style** so it's the developers responsibility to implement their own.
+- 🐿 Only **35.32KB gzipped** for the whole lib, compatible with old browsers: >0.03% usage.
+- 🔮 No legacy: **created in 2019**, with hooks.

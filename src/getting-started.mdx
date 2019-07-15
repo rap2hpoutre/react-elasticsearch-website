@@ -44,7 +44,6 @@ import "./styles.css";
 <Elasticsearch url={conf.url} headers={conf.headers}>
   <Results
     id="result"
-    itemsPerPage="8"
     items={data => data.map(item => <div>{item._source.original_title}</div>)}
   />
 </Elasticsearch>
